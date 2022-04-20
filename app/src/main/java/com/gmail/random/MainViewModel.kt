@@ -1,6 +1,5 @@
 package com.gmail.random
 
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +12,8 @@ private const val REGULAR_DELAY = 3L
 
 class MainViewModel : ViewModel() {
 
+    private val backgroundExecutor: ScheduledExecutorService =
+        Executors.newSingleThreadScheduledExecutor()
     private val _number = MutableLiveData<Int>()
     val number: LiveData<Int>
         get() = _number
@@ -22,10 +23,13 @@ class MainViewModel : ViewModel() {
     }
 
     private fun start() {
-        val backgroundExecutor: ScheduledExecutorService =
-            Executors.newSingleThreadScheduledExecutor()
         backgroundExecutor.scheduleAtFixedRate({
             _number.postValue((0..10).random())
         }, START_DELAY, REGULAR_DELAY, TimeUnit.SECONDS)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        backgroundExecutor.shutdown()
     }
 }
