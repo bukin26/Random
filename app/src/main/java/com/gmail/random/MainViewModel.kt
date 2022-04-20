@@ -1,23 +1,31 @@
 package com.gmail.random
 
 import androidx.lifecycle.ViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-private const val START_DELAY = 0L
-private const val REGULAR_DELAY = 3L
+private const val REGULAR_DELAY = 3000L
 
 class MainViewModel : ViewModel() {
 
-    val observable: Observable<Int> =
-        Observable.interval(START_DELAY, REGULAR_DELAY, TimeUnit.SECONDS)
-            .flatMap {
-                return@flatMap Observable.create<Int> {
-                    it.onNext((0..100).random())
-                }
+    private val _numberFlow = MutableStateFlow(getRandomNumber())
+    val numberFlow: StateFlow<Int>
+        get() = _numberFlow
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            while (true) {
+                delay(REGULAR_DELAY)
+                _numberFlow.emit(getRandomNumber())
             }
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
+        }
+    }
+
+    private fun getRandomNumber(): Int {
+        return (0..100).random()
+    }
 }

@@ -3,8 +3,11 @@ package com.gmail.random
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.random.databinding.ActivityMainBinding
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,9 +25,11 @@ class MainActivity : AppCompatActivity() {
             recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
             recyclerView.adapter = adapter
         }
-        viewModel.observable.subscribe {
-            list.add(it)
-            adapter.submitList(list.toList())
+        lifecycleScope.launch {
+            viewModel.numberFlow.collect {
+                list.add(it)
+                adapter.submitList(list.toList())
+            }
         }
     }
 }
