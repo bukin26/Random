@@ -5,6 +5,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gmail.random.databinding.ActivityMainBinding
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 class MainActivity : AppCompatActivity() {
 
@@ -12,6 +13,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private val adapter = MyAdapter()
     private val list = mutableListOf<Int>()
+    private val disposables = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,9 +24,16 @@ class MainActivity : AppCompatActivity() {
             recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
             recyclerView.adapter = adapter
         }
-        viewModel.numberSource.subscribe {
+        disposables.add(viewModel.numberSource.subscribe({
             list.add(it)
             adapter.submitList(list.toList())
-        }
+        }, {
+            it.printStackTrace()
+        }))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        disposables.dispose()
     }
 }

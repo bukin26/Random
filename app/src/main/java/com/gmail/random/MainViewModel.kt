@@ -13,11 +13,7 @@ class MainViewModel : ViewModel() {
 
     val numberSource: Observable<Int> =
         Observable.interval(START_DELAY, REGULAR_DELAY, TimeUnit.SECONDS)
-            .flatMap {
-                return@flatMap Observable.create<Int> {
-                    it.onNext((0..100).random())
-                }
-            }
+            .map { (0..100).random() }
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
 }
