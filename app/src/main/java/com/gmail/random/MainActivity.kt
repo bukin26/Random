@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
             recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
             recyclerView.adapter = adapter
         }
-        viewModel.observable.subscribe {
+        viewModel.numberSource.subscribe {
             list.add(it)
             adapter.submitList(list.toList())
         }

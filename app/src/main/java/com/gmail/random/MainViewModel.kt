@@ -11,7 +11,7 @@ private const val REGULAR_DELAY = 3L
 
 class MainViewModel : ViewModel() {
 
-    val observable: Observable<Int> =
+    val numberSource: Observable<Int> =
         Observable.interval(START_DELAY, REGULAR_DELAY, TimeUnit.SECONDS)
             .flatMap {
                 return@flatMap Observable.create<Int> {
